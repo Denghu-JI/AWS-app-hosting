@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { HierarchyNode, HierarchyPointNode } from 'd3';
-import '../../../app/style.css'
+// import '../../../app/style.css'
 
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
