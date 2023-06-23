@@ -1,7 +1,7 @@
 "use client"
 import TreeComponent, { data } from "../src/components/Rectangle/Rectangle";
-import NodeCard from '../src/components/nodeCard/nodeCard';
-import MyComponent from "./awsAPI";
+// import NodeCard from '../src/components/nodeCard/nodeCard';
+// import MyComponent from "./awsAPI";
 import React from "react";
 
 export default function Home() {
