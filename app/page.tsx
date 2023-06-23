@@ -10,7 +10,6 @@ export default function Home() {
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm p-0 m-0">
       <TreeComponent {...data} />
       </div>
-{/*       <NodeCard /> */}
     </main>
   )
 }
