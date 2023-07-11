@@ -5,11 +5,12 @@ import TreeContext from './context';
 import {onClick} from '../Rectangle/treeComponent'
 import Box from '@mui/material/Box';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton'
 import {MenuItem} from '@mui/material';
-import { fromJSON } from 'postcss';
 import {IconButton} from '@mui/material';
 import {Menu} from '@mui/material';
-import { AnyARecord } from 'dns';
+
 
 
 
@@ -19,7 +20,14 @@ import { AnyARecord } from 'dns';
 const Panel : React.FC<onClick> = ({onClickTree, onClickTheme}) => {
     const [viewportDim, setViewportDim] = useState({height : 0, width : 0});
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [phone_mode, set_phone_mode] = useState<boolean>(false)
 
+    useEffect(() => {
+        console.log(window.innerWidth)
+        if (window.innerWidth > 600) set_phone_mode(true)
+        else set_phone_mode(false)
+      }, [phone_mode]);
+      
     useEffect(() => {
         setViewportDim({height: window.innerHeight, width: window.innerWidth});
     }, []);
@@ -30,23 +38,30 @@ const Panel : React.FC<onClick> = ({onClickTree, onClickTheme}) => {
     }
 
 
-    const selectTree = (event: SelectChangeEvent) => {
-        console.log(onClickTree)
+    const selectTree = (event: any, newValue: string) => {
+        console.log(newValue);
+        onClickTree(newValue);
+        setTree(newValue);
+    };
+
+    const selectTreebar = (event: any) => {
+        console.log(event.target.value)
         onClickTree(event.target.value);
         setTree(event.target.value);
-      };
+    };
     //tree selection
     const [selectedTree, setTree] = useState("CoFI Methods");
     
+    function styleText(content : string) {
+        return (<div style = {inLabStyle.selectTextCSS}>
+            {content}
+        </div>)
+    }
+
     function treeSelection() {
-        function styleText(content : string) {
-            return (<p style = {inLabStyle.selectTextCSS}>
-                {content}
-            </p>)
-        }
 
         return (
-            <Select value={selectedTree} onChange={selectTree} sx = {inLabStyle.selectCSS}>
+            <Select value={selectedTree} onChange={selectTreebar} sx = {inLabStyle.selectCSS}>
                 <MenuItem value="CoFI Methods">{styleText("CoFI Methods")}</MenuItem>
                 <MenuItem value="CoFI Examples">{styleText("CoFI Examples")}</MenuItem>
                 <MenuItem value="Espresso Problems">{styleText("Espresso Problems")}</MenuItem>
@@ -109,9 +124,33 @@ const Panel : React.FC<onClick> = ({onClickTree, onClickTheme}) => {
         );
     }
 
+    function treeSelection_wide() {
+        return (
+            <div >
+            <ToggleButtonGroup
+                value={selectedTree}
+                exclusive
+                onChange={selectTree}
+                aria-label="CoFI Methods"
+                style={{height: '80%'}}
+                >
+                <ToggleButton value="CoFI Methods" aria-label="CoFI Methods">
+                    {styleText("CoFI Methods")}
+                </ToggleButton>
+                <ToggleButton value="CoFI Examples" aria-label="CoFI Examples">
+                    {styleText("CoFI Examples")}
+                </ToggleButton>
+                <ToggleButton value="Espresso Problems" aria-label="Espresso Problems">
+                    {styleText("Espresso Problems")}
+                </ToggleButton>
+            </ToggleButtonGroup>
+            </div>
+        )
+    }
 
 
-    function bar() {
+
+    function bar_phone() {
         return (
             <Box sx={inLabStyle.barCSS}>
                 {logo()}
@@ -119,8 +158,23 @@ const Panel : React.FC<onClick> = ({onClickTree, onClickTheme}) => {
                 {sideMenu()}
             </Box>
             )
-        }  
-    
+        }
+        
+    function bar_wide() {
+    return (
+        <Box sx={inLabStyle.barCSS}>
+            {logo()}
+            {treeSelection_wide()}
+            {sideMenu()}
+        </Box>
+        )
+    }  
+
+    function bar() {
+        console.log(phone_mode)
+        if (phone_mode) return bar_wide()
+        else return bar_phone()
+    }
 
     //-------------------------------------------------------------
     return (
@@ -130,4 +184,6 @@ const Panel : React.FC<onClick> = ({onClickTree, onClickTheme}) => {
     )
 }
 
+
 export default Panel
+

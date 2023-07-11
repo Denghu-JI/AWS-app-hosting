@@ -39,14 +39,21 @@ function measureTextWidth(text : string, font : string) {
   return 0;  // fallback in case getting the context fails
 }
 
+
+interface Popupcont {
+  visible: boolean;
+  selectedMethod: string | null;
+}
+
 interface selected {
   selectedTree: any; 
-  selectedTheme: any
+  selectedTheme: any;
+  setPopup: (Popup: Popupcont) => void;
 }
 
 
 
-const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
+const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme, setPopup}) => {
 
   const tree: TreeProps = {
     data: null
@@ -91,7 +98,7 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
     }
 
     if (selectedTree === "CoFI Examples") {
-      fetch('https://jsonofthetree.s3.ap-southeast-2.amazonaws.com/app_relation.json')
+      fetch('https://jsonofthetree.s3.ap-southeast-2.amazonaws.com/example_relation.json')
       .then((response) => response.json())
       .then((data) => setTreeData(data))
       .catch((error) => console.error(error));
@@ -125,14 +132,13 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
       return   d.data?.link_doc? `<a href=" ${d.data?.link_doc} " target="_blank" style="text-decoration: none;">` : " "
     }
     function getLinkGit(d : TreeProps) {
-      console.log(d.data?.link_git)
-      return   d.data?.link_git? `<a href=" ${d.data?.link_git} " target="_blank" style="text-decoration: none;">` : " "
+      return   d.data?.link_git? `<a href=" ${d.data?.link_git} " target="_blank" style="text-decoration: none;"><button style="background-color: ${d.data?.link_git? color : "#b8b8b8"}; width: ${width}px; border: none; color: white; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">Git</button></a>` : " "
     }
+
     return (`
-    ${getLinkGit(d)}<button style="background-color: ${d.data?.link_git? color : "#b8b8b8"}; width: ${width}px; border: none; color: white; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">Git</button></a>
+    ${getLinkGit(d)}
     ${getLinkDoc(d)}<button style="background-color: ${d.data?.link_doc? color : "#b8b8b8"}; width: ${width}px; border: none; color: white; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">Documentation</button></a>
-    <a href="${d.data}" target="_blank" style="text-decoration: none;"><button style="background-color: #008CBA; width: ${width}px;border: none; color: white; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">Select Example</button>
-    <a href="${d.data}" target="_blank" style="text-decoration: none;"><button style="background-color: #008CBA; width: ${width}px;color: black; border: none; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">and..?</button>`
+    <button id="tooltip-button" style="background-color: #008CBA; width: ${width}px; border: none; color: white; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">Show Examples</button>`
     )
     }
 
@@ -150,6 +156,8 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
 
         var i = 0, duration = 750;
         let treeRoot: any;
+        let selectedMethod = "CoFI";
+        let longpress = false;
         var nodeSize = { width: 200, height: 200}
         var treemap = d3.tree()
           .nodeSize([nodeSize.width, nodeSize.height])
@@ -206,8 +214,11 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
               nodeEnter
                 .attr("class", "node")
                 .attr("r", 1e-6)
-                .style("fill", function(d) {
-                  return d.parent ? treeTheme.nodeFill : treeTheme.headnodeFill;
+                .style("fill", function(d : any) {
+                  if (d.parent) {
+                    return d.children || d._children ? treeTheme.nodeFill : treeTheme.terminalFill;
+                  }
+                  return treeTheme.headnodeFill;
                 });
               
               
@@ -224,11 +235,11 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
                 .attr("stroke-width", function(d) {
                   return d.parent ? 1 : 0;
                 })
-                .attr("stroke", function(d : any) {
-                  return d.children || d._children
-                    ? treeTheme.nodeStroke
-                    : "rgb(38, 222, 176)";
-                })
+                // .attr("stroke", function(d : any) {
+                //   return d.children || d._children
+                //     ? treeTheme.nodeStroke
+                //     : "rgb(38, 222, 176)";
+                // })
                 .attr("stroke-dasharray", function(d : any) {
                   return d.children || d._children ? "0" : "2.2";
                 })
@@ -254,9 +265,10 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
                 .style("font-family", "Arial")
                 .style("fill", function(d : any) {
                   if (d.parent) {
-                    return d.children || d._children ? treeTheme.text : "rgb(38, 222, 176)";
+                    return d.children || d._children ? treeTheme.text : treeTheme.terminalText;
                   }
-                  return "rgb(39, 43, 77)";
+                  console.log(treeTheme.headText)
+                  return treeTheme.headText;
                 })
                 .attr("dy", ".35em")
                 .attr("x", function(d) {
@@ -275,38 +287,49 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
                     if (pressTimer !== null) {
                         clearTimeout(pressTimer);
                     }   
-            
                     pressTimer = setTimeout(function() { 
                         // If the mousedown event's duration is longer than 500 ms, it is a long press
+                        longpress = true;
+                        selectedMethod = d.data.name
+                        console.log(selectedMethod)
                         tooltip.style("left", event.pageX + "px")
                             .style("top", event.pageY + "px")
                             .style("opacity", 1)
                             .html(`
-                            <div style="border: 1px solid black; width: ${d.data.width + 20}px; min-width: 200px ;  max-height: 500px; overflow: auto; padding: 10px;">
+                            <div style="border: 1px solid black; width: ${d.data.width + 50}px; min-width: 200px ;  max-height: 500px; overflow: auto; padding: 10px;">
                               <div style="background-color: lightgray; padding: 10px;">
                                 ${d.data.name}
                               </div>
-                              <div style="background-color: white; padding: 10px; margin-top: 10px; word-wrap: break-word; width: ${d.data.width}px;min-height: 150px;">
+                              <div style="background-color: white; padding: 10px; margin-top: 10px; word-wrap: break-word; width: ${d.data.width + 30}px;min-height: 150px;">
                                   ${generate_des(d)}
                               </div>
-                              <div style="display: flex; justify-content: space-around; margin-top: 10px; width: ${d.data.width}px; min-width: 160px;">
+                              <div style="display: flex; justify-content: space-around; margin-top: 10px; width: ${d.data.width+ 30}px; min-width: 160px;">
                                 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; width:100%">
-                                ${gen_button(d, "#008CBA", "#fff", d.data.width)}
+                                ${gen_button(d, "#008CBA", "#fff", d.data.width+ 30)}
+
                                 </div>
                               </div>
                             </div>
                             `);
                     }, 800); // This delay of 500 ms could be adjusted
-                    event.stopPropagation();
+                  event.stopPropagation();
                 });
               
-            document.addEventListener("mouseup", function () {
+            document.addEventListener("mouseup", function (event) {
                 // Clear the timer when the mouse button is released
                 if(pressTimer !== null) {
                     clearTimeout(pressTimer);
                     pressTimer = null;
                     console.log("clear!");
                 }
+
+            document.addEventListener('click', function(event : any) {
+                  var isButton = event.target.id === 'tooltip-button';
+                  if (!isButton) {
+                      return;
+                  }
+                  setPopup({selectedMethod: selectedMethod, visible: true})
+              });
             });
                 
 
@@ -374,6 +397,9 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
             }
 
               function click(event:any, d : any) {
+                if(longpress) {
+                  return;
+              }
                 if (d.children) {
                   d._children = d.children;
                   d.children = null;
@@ -391,6 +417,10 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme}) => {
               }
         }
         svg.on("click", function() {
+          if(longpress) {
+            longpress = false; // Reset the flag
+            return;
+        }
           tooltip.style("opacity", 0);
       });
 

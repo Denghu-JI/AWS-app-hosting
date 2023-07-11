@@ -16,12 +16,11 @@ html, body {
   .link {
     fill: none;
     stroke: rgb(55, 68, 105);
-    stroke-width: 1px;
+    stroke-width: 2px;
   }
 
   .nodeCard {
-    border: 1px solid black;
-    background-color: lightgray;
+
   }
 
   /* .nodeCard button {

@@ -31,7 +31,7 @@ const selectCSS = {
 const selectTextCSS = {
     color: "#06131f",
     fontWeight: "bold",
-    fontStyle: "italic"
+    // fontStyle: "italic"
 
 }
 
