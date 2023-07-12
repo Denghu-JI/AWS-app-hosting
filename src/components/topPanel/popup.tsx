@@ -87,9 +87,12 @@ const Popup : React.FC<PopupEvent> = ({popupContent, setPopup}) => {
 
     function listExamples() {
         if (popupContent.selectedMethod) {
-            return exampleExample[popupContent.selectedMethod].map((example, index) => {
-                return singleContent(example.name, example.description, example.linkToGit);
-            });
+            if (exampleExample[popupContent.selectedMethod]) {
+                return exampleExample[popupContent.selectedMethod].map((example, index) => {
+                    return singleContent(example.name, example.description, example.linkToGit);
+                });
+
+            }
         }
         return null; // Return null if no examples found
     }
