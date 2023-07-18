@@ -129,7 +129,7 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme, setPopu
 
   function gen_button(d : TreeProps, color : string, textColor : string, width : number) {
     function getLinkDoc(d : TreeProps) {
-      return   d.data?.link_doc? `<a href=" ${d.data?.link_doc} " target="_blank" style="text-decoration: none;">` : " "
+      return   d.data?.link_doc? `<a href=" ${d.data?.link_doc} " target="_blank" style="text-decoration: none;"><button style="background-color: ${d.data?.link_doc? color : "#b8b8b8"}; width: ${width}px; border: none; color: white; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">Documentation</button></a>` : " "
     }
     function getLinkGit(d : TreeProps) {
       return   d.data?.link_git? `<a href=" ${d.data?.link_git} " target="_blank" style="text-decoration: none;"><button style="background-color: ${d.data?.link_git? color : "#b8b8b8"}; width: ${width}px; border: none; color: white; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">Git</button></a>` : " "
@@ -137,7 +137,7 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme, setPopu
 
     return (`
     ${getLinkGit(d)}
-    ${getLinkDoc(d)}<button style="background-color: ${d.data?.link_doc? color : "#b8b8b8"}; width: ${width}px; border: none; color: white; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">Documentation</button></a>
+    ${getLinkDoc(d)}
     <button id="tooltip-button" style="background-color: #008CBA; width: ${width}px; border: none; color: white; padding: 5px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 12px; box-sizing: border-box;">Show Examples</button>`
     )
     }

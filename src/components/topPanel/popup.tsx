@@ -1,7 +1,7 @@
 import { inLabStyle } from "./style";
 import React, { useEffect, useRef, useState, useContext, useLayoutEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-
+import { TreeNode } from "../Rectangle/treeComponent";
 
 
 interface Example {
@@ -9,33 +9,45 @@ interface Example {
     description: string;
     linkToGit: string;
   }
-  
-  let pygimli_dcip: Example = {
-    name: "pygimli_dcip",
-    description: "this would be an example of example description",
-    linkToGit: "https://github.com/Denghu-JI/cofi-examples/tree/main/examples/pygimli_dcip"
+
+let exampleExample: Record<string, Example[]> = {
+    "CoFI":[],
   }
 
-  let pygimli_dcip2: Example = {
-    name: "pygimli_dcip",
-    description: "this would be an example of example description",
-    linkToGit: "https://github.com/Denghu-JI/cofi-examples/tree/main/examples/pygimli_dcip"
-  }
 
-  let pygimli_dcip3: Example = {
-    name: "pygimli_dcip",
-    description: "this would be an example of example description",
-    linkToGit: "https://github.com/Denghu-JI/cofi-examples/tree/main/examples/pygimli_dcip"
-  }
+function load_examples(data : any) {
+    if (data.examples) {
+        console.log(data.name)
+        data.examples.forEach((example: any) => {
+            // Check if the key exists
+            if (exampleExample[data.name]) {
+                // Key exists, append the new example
+                exampleExample[data.name].push({
+                    name: example.name,
+                    description: example.description,
+                    linkToGit: example.linkToGit
+                });
+            } else {
+                // Key does not exist, create new array with the new example
+                exampleExample[data.name] = [
+                    {
+                        name: example.name,
+                        description: example.description,
+                        linkToGit: example.linkToGit
+                    }
+                ];
+            }
+        });
+    }
+
+    if (data.children) {
+        data.children.forEach((child: any) => {
+            load_examples(child)
+        });
+    }
+}
+
   
-  let exampleExample: Record<string, Example[]> = {
-    "trust-ncg" : [pygimli_dcip],
-    "scipy.optimize.minimize " : [pygimli_dcip],
-    "Non-linear":[pygimli_dcip, pygimli_dcip2],
-    "Optimization":[pygimli_dcip, pygimli_dcip2, pygimli_dcip3],
-    "Parameter Estimation":[pygimli_dcip, pygimli_dcip2, pygimli_dcip3],
-    "CoFI":[pygimli_dcip, pygimli_dcip2, pygimli_dcip3],
-  }
 
 interface Popupcont {
     visible: boolean;
@@ -49,9 +61,17 @@ interface PopupEvent {
   }
 
 const Popup : React.FC<PopupEvent> = ({popupContent, setPopup}) => {
+
+    useEffect(() => {
+        fetch('https://jsonofthetree.s3.ap-southeast-2.amazonaws.com/method_relation.json')
+        .then((response) => response.json())
+        .then((data) => load_examples(data))
+        .catch((error) => console.error(error));
+    }, []);
+  
     //here will be some construction...
-
-
+    console.log(exampleExample)
+    
     function singleContent(title: string, description: string, link: string) {
         return (
             <div style={{width : '90%', 
