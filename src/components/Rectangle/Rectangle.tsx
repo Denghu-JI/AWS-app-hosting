@@ -85,20 +85,20 @@ const TreeComponent: React.FC<selected> = ({selectedTree, selectedTheme, setPopu
 
   useEffect(() => {
     if (selectedTree === 'CoFI Methods') {
-      fetch('https://jsonofthetree.s3.ap-southeast-2.amazonaws.com/method_relation.json')
+      fetch('/method_relation.json')
       .then((response) => response.json())
       .then((data) => setTreeData(data))
       .catch((error) => console.error(error));
     }
     if (selectedTree === "Espresso Problems") {
-      fetch('https://jsonofthetree.s3.ap-southeast-2.amazonaws.com/app_relation.json')
+      fetch('/app_relation.json')
       .then((response) => response.json())
       .then((data) => setTreeData(data))
       .catch((error) => console.error(error));
     }
 
     if (selectedTree === "CoFI Examples") {
-      fetch('https://jsonofthetree.s3.ap-southeast-2.amazonaws.com/example_relation.json')
+      fetch('/example_relation.json')
       .then((response) => response.json())
       .then((data) => setTreeData(data))
       .catch((error) => console.error(error));
